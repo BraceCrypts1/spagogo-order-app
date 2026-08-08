@@ -46,9 +46,13 @@
                                 var zone = document.getElementById("deliveryZone").value;
                                 var item = document.getElementById("menuItem").value;
                                 var quantity = document.getElementById("quantity").value;
-                             var itemText = document.getElementById("menuItem");
-                             var itemName = itemText.options[itemText.selectedIndex].text;
-                             var message = "New Order:%0AName: " + name + "%0APhone: " + phone + "%0AAddress: " + address + "%0AZone: " + zone + "%0AItem: " + itemName + "%0AQuantity: " + quantity;
+                                if (name === "" || phone === "" || address === "") {
+                                    alert("please fill in your name, phone number, and address before placing order.");
+                                    return;
+                                }
+                                var itemText = document.getElementById("menuItem");
+                                var itemName = itemText.options[itemText.selectedIndex].text;
+                                var message = "New Order:%0AName: " + name + "%0APhone: " + phone + "%0AAddress: " + address + "%0AZone: " + zone + "%0AItem: " + itemName + "%0AQuantity: " + quantity;
                              var whatsappURL = "https://wa.me/2347055076189?text=" + message;
                             window.open(whatsappURL, "_blank");
                             });
