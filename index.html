@@ -38,7 +38,11 @@
                                             <input type="number" id="quantity" name="quantity" min="1" value="1">
                                             <button type="button" id="submitOrder">Place Order</button>
                         </form>
+                        <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
                         <script>
+                            const supabaseUrl = "https://secpyyvdokaidzkstbqm.supabase.co";
+                            const supabaseKey = "sb_publishable_8tDy1gTILSX3CVCNTcyF1g_toSX7sr8";
+                            const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
                             document.getElementById("submitOrder").addEventListener("click", function() {
                                 var name = document.getElementById("customerName").value;
                                 var phone = document.getElementById("customerPhone").value;
@@ -52,6 +56,25 @@
                                 }
                                 var itemText = document.getElementById("menuItem");
                                 var itemName = itemText.options[itemText.selectedIndex].text;
+                                supabaseClient
+                                .from("orders")
+                                .insert([
+                                    {
+                                        customer_name: name,
+                                        phone: phone,
+                                        address: address,
+                                        zone: zone,
+                                        item: itemName,
+                                        quantity: quantity
+                                    }
+                                ])
+                                .then(function(response) {
+                                    if (response.error) {
+                                        console.log("Error saving order:", response.error);
+                                    } else {
+                                        console.log("Order saved successfully");
+                                    }
+                                });
                                 var message = "New Order:%0AName: " + name + "%0APhone: " + phone + "%0AAddress: " + address + "%0AZone: " + zone + "%0AItem: " + itemName + "%0AQuantity: " + quantity;
                              var whatsappURL = "https://wa.me/2347055076189?text=" + message;
                             window.open(whatsappURL, "_blank");
