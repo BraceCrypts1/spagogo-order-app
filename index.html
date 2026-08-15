@@ -30,7 +30,7 @@
                                         <select id="menuItem" name="menuItem">
                                             <option value="item1">Spicy Spaghetti + Beef + Egg - ₦1,500</option>
                                             <option value="item2">Spicy Spaghetti + Peppered stir-Fry Chicken(meduim) + Egg - ₦2,000</option>
-                                            <option value="item2">Spicy Spaghetti + Peppered stir-Fry Chicken(Big) + Egg - ₦2,500</option>
+                                            <option value="item3">Spicy Spaghetti + Peppered stir-Fry Chicken(Big) + Egg - ₦2,500</option>
                                             </select>
                                             </div>
                                             <div>
@@ -52,6 +52,11 @@
                                 var quantity = document.getElementById("quantity").value;
                                 if (name === "" || phone === "" || address === "") {
                                     alert("please fill in your name, phone number, and address before placing order.");
+                                    return;
+                                }
+                                var phonePattern = /^[0-9]{10,11}$/;
+                                if (!phonePattern.test(phone)) {
+                                    alert("please enter a valid phone number (10-11 digits, no letters or symbols).");
                                     return;
                                 }
                                 var itemText = document.getElementById("menuItem");
