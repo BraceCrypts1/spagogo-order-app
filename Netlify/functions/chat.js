@@ -67,7 +67,7 @@ exports.handler = async (event) => {
   }
  
   // Verify this model ID is current before you deploy — check Google AI Studio.
-  const MODEL = "gemini-2.5-flash";
+     const MODEL = "gemini-3.5-flash";
  
   try {
     const response = await fetch(
