@@ -38,6 +38,20 @@
                                             <input type="number" id="quantity" name="quantity" min="1" value="1">
                                             <button type="button" id="submitOrder">Place Order</button>
                         </form>
+                        <div id="chatWidget">
+    <button type="button" id="chatToggleBtn" aria-label="Chat with us">💬 Ask a question</button>
+    <div id="chatWindow" class="hidden">
+        <div id="chatHeader">
+            <span>Fatima Spagogo — Ask us anything</span>
+            <button id="chatCloseBtn" aria-label="Close chat">×</button>
+        </div>
+        <div id="chatMessages"></div>
+        <div id="chatInputRow">
+            <input type="text" id="chatInput" placeholder="Type a question...">
+            <button type="button" id="chatSendBtn">Send</button>
+        </div>
+    </div>
+</div>
                         <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
                         <script>
                             const supabaseUrl = "https://secpyyvdokaidzkstbqm.supabase.co";
@@ -85,5 +99,64 @@
                             window.open(whatsappURL, "_blank");
                             });
                             </script>
+                            <script>
+(function () {
+    var CHAT_ENDPOINT = "https://lustrous-meerkat-6dc043.netlify.app/.netlify/functions/chat";
+
+    var toggleBtn = document.getElementById("chatToggleBtn");
+    var closeBtn = document.getElementById("chatCloseBtn");
+    var chatWindow = document.getElementById("chatWindow");
+    var messagesEl = document.getElementById("chatMessages");
+    var inputEl = document.getElementById("chatInput");
+    var sendBtn = document.getElementById("chatSendBtn");
+
+    toggleBtn.addEventListener("click", function () {
+        chatWindow.classList.toggle("hidden");
+    });
+    closeBtn.addEventListener("click", function () {
+        chatWindow.classList.add("hidden");
+    });
+
+    function addMessage(text, sender) {
+        var div = document.createElement("div");
+        div.className = "chatMsg " + sender;
+        div.textContent = text;
+        messagesEl.appendChild(div);
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    function sendMessage() {
+        var text = inputEl.value.trim();
+        if (!text) return;
+        addMessage(text, "user");
+        inputEl.value = "";
+        sendBtn.disabled = true;
+
+        fetch(CHAT_ENDPOINT, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message: text })
+        })
+        .then(function (res) { return res.json(); })
+        .then(function (data) {
+            sendBtn.disabled = false;
+            addMessage(data.reply || "Sorry, something went wrong. Please try WhatsApp instead.", "bot");
+        })
+        .catch(function () {
+            sendBtn.disabled = false;
+            addMessage("Sorry, I couldn't reach the assistant. Please try WhatsApp instead.", "bot");
+        });
+    }
+
+    sendBtn.addEventListener("click", sendMessage);
+    inputEl.addEventListener("keydown", function (e) {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            sendMessage();
+        }
+    });
+})();
+</script>
+                           
                         </body>
                         </html>
