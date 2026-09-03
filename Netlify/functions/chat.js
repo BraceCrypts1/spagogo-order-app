@@ -26,6 +26,7 @@ FACTS YOU MUST STICK TO — do not invent anything beyond this list:
 RULES:
 - If asked about anything not covered above (other delivery zones, card payment, bulk/event orders, etc.), say you're not sure and tell them to confirm directly on WhatsApp.
 - Keep every answer to 2–3 sentences. This is a quick FAQ chat, not a conversation.
+- When asked about hours, days, or availability, always state the exact days and time window from the FACTS section above, word for word. Never answer vaguely.
 - Never make up a price, menu item, or delivery zone that isn't listed above.`;
  
 exports.handler = async (event) => {
@@ -61,6 +62,8 @@ exports.handler = async (event) => {
   }
  
   const apiKey = process.env.GEMINI_API_KEY;
+  console.log("Key length:", apiKey ? apiKey.length : "undefined");
+console.log("Key ending:", apiKey ? apiKey.slice(-6) : "n/a");
   if (!apiKey) {
     console.error("GEMINI_API_KEY not set in environment");
     return { statusCode: 500, headers, body: JSON.stringify({ error: "Server misconfigured" }) };
@@ -81,7 +84,11 @@ exports.handler = async (event) => {
         body: JSON.stringify({
           system_instruction: { parts: [{ text: SYSTEM_CONTEXT }] },
           contents: [{ role: "user", parts: [{ text: userMessage }] }],
-          generationConfig: { maxOutputTokens: 200, temperature: 0.4 },
+          generationConfig: {
+    maxOutputTokens: 4096,
+    temperature: 0.4,
+    thinkingConfig: { thinkingLevel: "low" }
+},
         }),
       }
     );
@@ -94,10 +101,13 @@ exports.handler = async (event) => {
     }
  
     const data = await response.json();
-    const reply =
-      data?.candidates?.[0]?.content?.parts?.[0]?.text ??
-      "Sorry, I couldn't generate a response. Please try WhatsApp instead.";
- 
+    console.log("finishReason:", data?.candidates?.[0]?.finishReason);
+console.log("usageMetadata:", JSON.stringify(data?.usageMetadata));
+    const parts = data?.candidates?.[0]?.content?.parts || [];
+const reply = parts
+    .filter(function (p) { return p.text && !p.thought; })
+    .map(function (p) { return p.text; })
+    .join("") || "Sorry, I couldn't generate a response. Please try WhatsApp instead.";
     return { statusCode: 200, headers, body: JSON.stringify({ reply }) };
   } catch (err) {
     console.error("Function error:", err);
