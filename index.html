@@ -125,37 +125,45 @@
         messagesEl.scrollTop = messagesEl.scrollHeight;
     }
 
-    function sendMessage() {
-        var text = inputEl.value.trim();
-        if (!text) return;
-        addMessage(text, "user");
-        inputEl.value = "";
-        sendBtn.disabled = true;
+    function showTyping() {
+    var div = document.createElement("div");
+    div.className = "chatMsg bot typing";
+    div.id = "typingIndicator";
+    div.innerHTML = "<span class=\"dot\"></span><span class=\"dot\"></span><span class=\"dot\"></span>";
+    messagesEl.appendChild(div);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+}
 
-        fetch(CHAT_ENDPOINT, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ message: text })
-        })
-        .then(function (res) { return res.json(); })
-        .then(function (data) {
-            sendBtn.disabled = false;
-            addMessage(data.reply || "Sorry, something went wrong. Please try WhatsApp instead.", "bot");
-        })
-        .catch(function () {
-            sendBtn.disabled = false;
-            addMessage("Sorry, I couldn't reach the assistant. Please try WhatsApp instead.", "bot");
-        });
-    }
+function hideTyping() {
+    var el = document.getElementById("typingIndicator");
+    if (el) el.remove();
+}
 
-    sendBtn.addEventListener("click", sendMessage);
-    inputEl.addEventListener("keydown", function (e) {
-        if (e.key === "Enter") {
-            e.preventDefault();
-            sendMessage();
-        }
+function sendMessage() {
+    var text = inputEl.value.trim();
+    if (!text) return;
+    addMessage(text, "user");
+    inputEl.value = "";
+    sendBtn.disabled = true;
+    showTyping();
+
+    fetch(CHAT_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: text })
+    })
+    .then(function (res) { return res.json(); })
+    .then(function (data) {
+        hideTyping();
+        sendBtn.disabled = false;
+        addMessage(data.reply || "Sorry, something went wrong. Please try WhatsApp instead.", "bot");
+    })
+    .catch(function () {
+        hideTyping();
+        sendBtn.disabled = false;
+        addMessage("Sorry, I couldn't reach the assistant. Please try WhatsApp instead.", "bot");
     });
-})();
+}
 </script>
                            
                         </body>
