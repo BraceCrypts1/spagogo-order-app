@@ -5,7 +5,7 @@
         <link rel="stylesheet" href="style.css">
         </head>
         <body>
-            <form>
+            <form id="orderForm">
                 <div>
                     <label for="customerName">Full Name:</label>
                     <input type="text" id="customerName" name="customerName" placeholder="e.g. John Doe">
@@ -139,6 +139,24 @@ function hideTyping() {
     if (el) el.remove();
 }
 
+function handleOrderHandoff(item, quantity) {
+    var form = document.getElementById("orderForm");
+    if (!form) return;
+
+    if (["item1", "item2", "item3"].indexOf(item) !== -1) {
+        document.getElementById("menuItem").value = item;
+    }
+    if (Number.isInteger(quantity) && quantity > 0) {
+        document.getElementById("quantity").value = quantity;
+    }
+
+    form.scrollIntoView({ behavior: "smooth", block: "center" });
+    form.classList.add("formHighlight");
+    setTimeout(function () {
+        form.classList.remove("formHighlight");
+    }, 3000);
+}
+
 function sendMessage() {
     var text = inputEl.value.trim();
     if (!text) return;
@@ -157,6 +175,9 @@ function sendMessage() {
         hideTyping();
         sendBtn.disabled = false;
         addMessage(data.reply || "Sorry, something went wrong. Please try WhatsApp instead.", "bot");
+        if (data.orderIntent && data.item && data.item !== "unknown") {
+            handleOrderHandoff(data.item, data.quantity);
+        }
     })
     .catch(function () {
         hideTyping();
