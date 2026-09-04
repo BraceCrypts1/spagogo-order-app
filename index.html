@@ -164,6 +164,14 @@ function sendMessage() {
         addMessage("Sorry, I couldn't reach the assistant. Please try WhatsApp instead.", "bot");
     });
 }
+sendBtn.addEventListener("click", sendMessage);
+inputEl.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") {
+        e.preventDefault();
+        sendMessage();
+    }
+});
+})();
 </script>
                            
                         </body>
