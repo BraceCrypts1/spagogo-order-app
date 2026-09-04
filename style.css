@@ -1,8 +1,12 @@
+*, *::before, *::after {
+    box-sizing: border-box;
+}
 body {
     font-family: Georgia, serif;
-    backgound-color: #faf4e8;
+    background-color: #faf4e8;
     color: #605c56;
-    padding: 20px
+    padding: 20px;
+    margin: 0;
 }
 form {
     max-width: 400px;
@@ -26,6 +30,8 @@ input, select {
     border: 1px solid #d0c095;
     border-radius: 4px;
     box-sizing: border-box;
+    font-size: 16px;
+    font-family: Georgia, serif;
 }
 button{
     background-color: #62110c;
@@ -52,8 +58,8 @@ button:hover {
 
 #chatWidget {
     position: fixed;
-    bottom: 20px;
-    right: 20px;
+    bottom: 16px;
+    right: 16px;
     font-family: Georgia, serif;
     z-index: 1000;
 }
@@ -69,8 +75,8 @@ button:hover {
 }
 #chatToggleBtn:hover { background-color: #732820; }
 #chatWindow {
-    width: 300px;
-    max-height: 420px;
+    width: min(300px, calc(100vw - 32px));
+    max-height: min(420px, 70vh);
     background-color: #faf4e8;
     border: 2px solid #62110c;
     border-radius: 8px;
