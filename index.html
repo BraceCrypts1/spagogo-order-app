@@ -64,7 +64,8 @@
                             const supabaseUrl = "https://secpyyvdokaidzkstbqm.supabase.co";
                             const supabaseKey = "sb_publishable_8tDy1gTILSX3CVCNTcyF1g_toSX7sr8";
                             const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
-                            document.getElementById("submitOrder").addEventListener("click", function() {
+                            document.getElementById("submitOrder").addEventListener("click", async function() {
+                                var submitBtn = this;
                                 var name = document.getElementById("customerName").value;
                                 var phone = document.getElementById("customerPhone").value;
                                 var address = document.getElementById("deliveryAddress").value;
@@ -82,7 +83,12 @@
                                 }
                                 var itemText = document.getElementById("menuItem");
                                 var itemName = itemText.options[itemText.selectedIndex].text;
-                                supabaseClient
+                                // Attach the order to the logged-in user, if any. Guests get null.
+                                // RLS enforces this server-side too: user_id must be null or equal auth.uid().
+                                var sessionRes = await supabaseClient.auth.getSession();
+                                var userId = sessionRes.data.session ? sessionRes.data.session.user.id : null;
+                                submitBtn.disabled = true;
+                                var response = await supabaseClient
                                 .from("orders")
                                 .insert([
                                     {
@@ -91,16 +97,16 @@
                                         address: address,
                                         zone: zone,
                                         item: itemName,
-                                        quantity: quantity
+                                        quantity: quantity,
+                                        user_id: userId
                                     }
-                                ])
-                                .then(function(response) {
-                                    if (response.error) {
-                                        console.log("Error saving order:", response.error);
-                                    } else {
-                                        console.log("Order saved successfully");
-                                    }
-                                });
+                                ]);
+                                submitBtn.disabled = false;
+                                if (response.error) {
+                                    console.error("Error saving order:", response.error);
+                                    alert("Sorry, we couldn't save your order. Please try again or message us on WhatsApp.");
+                                    return;
+                                }
                                 var message = "New Order:%0AName: " + name + "%0APhone: " + phone + "%0AAddress: " + address + "%0AZone: " + zone + "%0AItem: " + itemName + "%0AQuantity: " + quantity;
                              var whatsappURL = "https://wa.me/2347055076189?text=" + message;
                             window.open(whatsappURL, "_blank");
@@ -202,5 +208,5 @@ inputEl.addEventListener("keydown", function (e) {
 })();
 </script>
                            
-                        </body>
+                        <script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3638b58ab6f889b',t:'MTc4ODU5MzU5MQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
                         </html>
