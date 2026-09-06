@@ -24,12 +24,17 @@
                         <h2 id="authTitle">Log in</h2>
                         <button type="button" id="authCloseBtn" aria-label="Close">×</button>
                     </div>
-                    <label for="authEmail">Email:</label>
-                    <input type="email" id="authEmail" name="email" autocomplete="email" required>
-                    <label for="authPassword">Password:</label>
-                    <input type="password" id="authPassword" name="password" autocomplete="current-password" minlength="6" required>
+                                        <div>
+                        <label for="authEmail">Email:</label>
+                        <input type="email" id="authEmail" name="email" autocomplete="email" required>
+                    </div>
+                    <div>
+                        <label for="authPassword">Password:</label>
+                        <input type="password" id="authPassword" name="password" autocomplete="current-password" minlength="6" required>
+                    </div>
                     <p id="authMessage" aria-live="polite"></p>
                     <button type="submit" id="authSubmitBtn">Log in</button>
+                                        <button type="button" id="authForgotBtn" class="linkBtn">Forgot your password?</button>
                     <button type="button" id="authSwitchBtn" class="linkBtn">New here? Create an account</button>
                 </form>
             </dialog>

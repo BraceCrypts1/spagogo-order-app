@@ -17,6 +17,7 @@
     var passEl    = document.getElementById("authPassword");
     var submitBtn = document.getElementById("authSubmitBtn");
     var switchBtn = document.getElementById("authSwitchBtn");
+    var forgotBtn = document.getElementById("authForgotBtn");
     var msgEl     = document.getElementById("authMessage");
     var openBtn   = document.getElementById("accountBtn");
     var closeBtn  = document.getElementById("authCloseBtn");
@@ -24,7 +25,7 @@
     var ordersLnk = document.getElementById("myOrdersLink");
     var statusEl  = document.getElementById("accountStatus");
 
-    var mode = "login"; // "login" | "signup"
+    var mode = "login"; // "login" | "signup" | "forgot" | "recovery"
 
     // If the user arrived via an expired/invalid confirmation link, Supabase puts the
     // reason in the URL hash (#error_description=...). Shown in the header until the
@@ -50,11 +51,23 @@
 
     function setMode(next) {
         mode = next;
-        var signup = mode === "signup";
-        titleEl.textContent   = signup ? "Create account" : "Log in";
-        submitBtn.textContent = signup ? "Create account" : "Log in";
-        switchBtn.textContent = signup ? "Already have an account? Log in" : "New here? Create an account";
-        passEl.setAttribute("autocomplete", signup ? "new-password" : "current-password");
+        var labels = {
+            login:    { title: "Log in",          submit: "Log in",          swap: "New here? Create an account" },
+            signup:   { title: "Create account",  submit: "Create account",  swap: "Already have an account? Log in" },
+            forgot:   { title: "Reset password",  submit: "Send reset link", swap: "Back to log in" },
+            recovery: { title: "Choose a new password", submit: "Save new password", swap: "" }
+        }[mode];
+        titleEl.textContent   = labels.title;
+        submitBtn.textContent = labels.submit;
+        switchBtn.textContent = labels.swap;
+        switchBtn.classList.toggle("hidden", !labels.swap);
+        // forgot: only the email is needed. recovery: only the new password.
+        emailEl.parentNode.classList.toggle("hidden", mode === "recovery");
+        passEl.parentNode.classList.toggle("hidden", mode === "forgot");
+        emailEl.required = mode !== "recovery";
+        passEl.required  = mode !== "forgot";
+        passEl.setAttribute("autocomplete", mode === "login" ? "current-password" : "new-password");
+        forgotBtn.classList.toggle("hidden", mode !== "login");
         showMsg("");
     }
 
@@ -77,7 +90,15 @@
     // SIGNED_IN / SIGNED_OUT / TOKEN_REFRESHED as things change.
     supabaseClient.auth.onAuthStateChange(function (event, session) {
         renderAuthState(session);
-        if (event === "SIGNED_IN" && dialog.hasAttribute("open")) closeDialog();
+        if (event === "PASSWORD_RECOVERY") {
+            // User arrived from the reset-password email. They are logged in via the
+            // link, but should not do anything else until they've set a new password.
+            setMode("recovery");
+            openDialog();
+            passEl.focus();
+            return;
+        }
+        if (event === "SIGNED_IN" && dialog.hasAttribute("open") && mode !== "recovery") closeDialog();
     });
 
     openBtn.addEventListener("click", function () {
@@ -90,6 +111,10 @@
     closeBtn.addEventListener("click", closeDialog);
     switchBtn.addEventListener("click", function () {
         setMode(mode === "login" ? "signup" : "login");
+    });
+    forgotBtn.addEventListener("click", function () {
+        setMode("forgot");
+        emailEl.focus();
     });
 
     logoutBtn.addEventListener("click", async function () {
@@ -104,14 +129,28 @@
         e.preventDefault();
         var email = emailEl.value.trim();
         var password = passEl.value;
-        if (!email || !password) {
-            showMsg("Please enter your email and password.", true);
+        if (mode === "forgot" ? !email : mode === "recovery" ? !password : (!email || !password)) {
+            showMsg("Please fill in the field above.", true);
             return;
         }
         submitBtn.disabled = true;
-        showMsg(mode === "signup" ? "Creating your account…" : "Logging in…");
+        showMsg({ signup: "Creating your account…", forgot: "Sending…", recovery: "Saving…" }[mode] || "Logging in…");
         try {
-            if (mode === "login") {
+            if (mode === "forgot") {
+                var reset = await supabaseClient.auth.resetPasswordForEmail(email, {
+                    redirectTo: window.location.origin + window.location.pathname
+                });
+                if (reset.error) { showMsg(reset.error.message, true); return; }
+                // Supabase returns success even for unknown emails (prevents enumeration).
+                showMsg("If an account exists for " + email + ", a reset link is on its way. Open it on this device, then choose a new password.");
+            } else if (mode === "recovery") {
+                var upd = await supabaseClient.auth.updateUser({ password: password });
+                if (upd.error) { showMsg(upd.error.message, true); return; }
+                passEl.value = "";
+                closeDialog();
+                setMode("login");
+                statusEl.textContent = "Password updated. You're logged in as " + upd.data.user.email;
+            } else if (mode === "login") {
                 var login = await supabaseClient.auth.signInWithPassword({ email: email, password: password });
                 if (login.error) { showMsg(login.error.message, true); return; }
                 showMsg("");
