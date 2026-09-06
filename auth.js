@@ -21,6 +21,7 @@
     var openBtn   = document.getElementById("accountBtn");
     var closeBtn  = document.getElementById("authCloseBtn");
     var logoutBtn = document.getElementById("logoutBtn");
+    var ordersLnk = document.getElementById("myOrdersLink");
     var statusEl  = document.getElementById("accountStatus");
 
     var mode = "login"; // "login" | "signup"
@@ -61,10 +62,12 @@
         if (session) {
             statusEl.textContent = "Logged in as " + session.user.email;
             openBtn.classList.add("hidden");
+            ordersLnk.classList.remove("hidden");
             logoutBtn.classList.remove("hidden");
         } else {
             statusEl.textContent = linkError;
             openBtn.classList.remove("hidden");
+            ordersLnk.classList.add("hidden");
             logoutBtn.classList.add("hidden");
         }
     }

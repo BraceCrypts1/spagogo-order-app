@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>My Orders — Fatima Spagogo</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="icon" type="image/svg+xml" href="logo.svg">
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <header class="siteHeader">
+            <a href="index.html"><img src="logo.svg" alt="Fatima Spagogo" width="56" height="56"></a>
+            <h1>My Orders</h1>
+            <p id="ordersStatus">Loading your orders…</p>
+        </header>
+
+        <section id="ordersPanel" class="ordersPanel hidden">
+            <div class="pointsSummary">
+                <span class="pointsLabel">Points earned</span>
+                <span id="pointsTotal" class="pointsTotal">0</span>
+                <span class="pointsHint">1 point per ₦100 on approved orders</span>
+            </div>
+            <ul id="ordersList" class="ordersList"></ul>
+            <p class="backLink"><a href="index.html">← Back to ordering</a></p>
+        </section>
+
+        <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+        <script>
+            const supabaseUrl = "https://secpyyvdokaidzkstbqm.supabase.co";
+            const supabaseKey = "sb_publishable_8tDy1gTILSX3CVCNTcyF1g_toSX7sr8";
+            const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+        </script>
+        <script src="orders.js"></script>
+    </body>
+</html>
