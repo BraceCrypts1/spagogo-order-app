@@ -11,7 +11,27 @@
                 <img src="logo.svg" alt="Fatima Spagogo" width="56" height="56">
                 <h1>Fatima Spagogo</h1>
                 <p>Spicy spaghetti, delivered hot to Ibafo &amp; Mowe.</p>
+                                <div class="accountBar">
+                    <span id="accountStatus"></span>
+                    <button type="button" id="accountBtn">Log in / Sign up</button>
+                    <button type="button" id="logoutBtn" class="hidden">Log out</button>
+                </div>
             </header>
+            <dialog id="authDialog">
+                <form id="authForm">
+                    <div class="authHeader">
+                        <h2 id="authTitle">Log in</h2>
+                        <button type="button" id="authCloseBtn" aria-label="Close">×</button>
+                    </div>
+                    <label for="authEmail">Email:</label>
+                    <input type="email" id="authEmail" name="email" autocomplete="email" required>
+                    <label for="authPassword">Password:</label>
+                    <input type="password" id="authPassword" name="password" autocomplete="current-password" minlength="6" required>
+                    <p id="authMessage" aria-live="polite"></p>
+                    <button type="submit" id="authSubmitBtn">Log in</button>
+                    <button type="button" id="authSwitchBtn" class="linkBtn">New here? Create an account</button>
+                </form>
+            </dialog>
             <form id="orderForm">
                 <div>
                     <label for="customerName">Full Name:</label>
@@ -208,5 +228,7 @@ inputEl.addEventListener("keydown", function (e) {
 })();
 </script>
                            
-                        <script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3638b58ab6f889b',t:'MTc4ODU5MzU5MQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+                                                <script src="auth.js"></script>
+                        </body>
                         </html>
+                        

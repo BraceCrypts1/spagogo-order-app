@@ -177,3 +177,64 @@ button:hover {
 }
 #chatInput { flex: 1; margin-top: 0; margin-right: 6px; }
 #chatSendBtn { margin-top: 0; padding: 8px 14px; }
+.hidden { display: none !important; }
+.accountBar {
+    margin-top: 10px;
+    font-size: 14px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 8px 12px;
+}
+.accountBar button {
+    margin-top: 0;
+    padding: 6px 14px;
+    font-size: 14px;
+}
+#authDialog {
+    border: none;
+    background: transparent;
+    padding: 0;
+    width: min(400px, calc(100vw - 32px));
+}
+#authDialog::backdrop { background: rgba(0, 0, 0, 0.45); }
+#authForm { margin: 0; }
+.authHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.authHeader h2 {
+    font-size: 20px;
+    color: #62110c;
+    margin: 0;
+}
+#authCloseBtn {
+    background: none;
+    color: #62110c;
+    font-size: 22px;
+    padding: 0 6px;
+    margin-top: 0;
+}
+#authSubmitBtn { width: 100%; }
+.linkBtn {
+    background: none;
+    color: #62110c;
+    text-decoration: underline;
+    font-weight: normal;
+    padding: 0;
+    margin-top: 12px;
+    display: block;
+    width: 100%;
+    font-family: Georgia, serif;
+    font-size: 14px;
+}
+.linkBtn:hover, #authCloseBtn:hover { background: none; color: #732820; }
+#authMessage {
+    font-size: 14px;
+    margin: 12px 0 0;
+    min-height: 1.4em;
+    line-height: 1.4;
+}
+#authMessage.error { color: #b3261e; }
