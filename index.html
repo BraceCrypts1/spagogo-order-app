@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <meta charset="UTF-8">
         <title>Spagogo Order form</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="icon" type="image/svg+xml" href="logo.svg">
@@ -48,6 +49,10 @@
                         <input type="tel" id="customerPhone" name="customerPhone" placeholder="e.g. 08012345678">
                         </div>
                         <div>
+                        <label for="customerEmail">Email (for your payment receipt):</label>
+                        <input type="email" id="customerEmail" name="customerEmail" placeholder="e.g. you@example.com (optional when logged in)" autocomplete="email">
+                        </div>
+                        <div>
                             <label for="deliveryAddress">Delivery Address:</label>
                             <input type="text" id="deliveryAddress" name="deliveryAddress" placeholder="e.g. 12 Ajayi street, Ibafo">
                             </div>
@@ -57,6 +62,7 @@
                                     <option value="ibafo">Ibafo</option>
                                     <option value="Mowe">Mowe</option>
                                     </select>
+                                    <small class="fieldNote">Ibafo: free delivery. Mowe: from ₦500, extra distance settled on WhatsApp.</small>
                                     </div>
                                     <div>
                                         <label for="menuItem">Menu Item:</label>
@@ -92,9 +98,10 @@
                             const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
                             document.getElementById("submitOrder").addEventListener("click", async function() {
                                 var submitBtn = this;
-                                var name = document.getElementById("customerName").value;
-                                var phone = document.getElementById("customerPhone").value;
-                                var address = document.getElementById("deliveryAddress").value;
+                                var name = document.getElementById("customerName").value.trim();
+                                var phone = document.getElementById("customerPhone").value.trim();
+                                var email = document.getElementById("customerEmail").value.trim();
+                                var address = document.getElementById("deliveryAddress").value.trim();
                                 var zone = document.getElementById("deliveryZone").value;
                                 var item = document.getElementById("menuItem").value;
                                 var quantity = document.getElementById("quantity").value;
@@ -107,35 +114,51 @@
                                     alert("please enter a valid phone number (10-11 digits, no letters or symbols).");
                                     return;
                                 }
-                                var itemText = document.getElementById("menuItem");
-                                var itemName = itemText.options[itemText.selectedIndex].text;
-                                // Attach the order to the logged-in user, if any. Guests get null.
-                                // RLS enforces this server-side too: user_id must be null or equal auth.uid().
+                                // Logged in? Send the access token so the server can attach the order to
+                                // the account (and use the account email if the email box is empty).
                                 var sessionRes = await supabaseClient.auth.getSession();
-                                var userId = sessionRes.data.session ? sessionRes.data.session.user.id : null;
-                                submitBtn.disabled = true;
-                                var response = await supabaseClient
-                                .from("orders")
-                                .insert([
-                                    {
-                                        customer_name: name,
-                                        phone: phone,
-                                        address: address,
-                                        zone: zone,
-                                        item: itemName,
-                                        quantity: quantity,
-                                        user_id: userId
-                                    }
-                                ]);
-                                submitBtn.disabled = false;
-                                if (response.error) {
-                                    console.error("Error saving order:", response.error);
-                                    alert("Sorry, we couldn't save your order. Please try again or message us on WhatsApp.");
+                                var session = sessionRes.data.session;
+                                if (email === "" && !session) {
+                                    alert("please enter your email address so we can send your payment receipt.");
                                     return;
                                 }
-                                var message = "New Order:%0AName: " + name + "%0APhone: " + phone + "%0AAddress: " + address + "%0AZone: " + zone + "%0AItem: " + itemName + "%0AQuantity: " + quantity;
-                             var whatsappURL = "https://wa.me/2347055076189?text=" + message;
-                            window.open(whatsappURL, "_blank");
+                                var headers = { "Content-Type": "application/json" };
+                                if (session) headers["Authorization"] = "Bearer " + session.access_token;
+                                submitBtn.disabled = true;
+                                submitBtn.textContent = "Starting payment\u2026";
+                                var result = null;
+                                try {
+                                    // The server prices the order (menu + delivery fee), saves it as
+                                    // 'pending' and asks Paystack for a checkout link.
+                                    var res = await fetch("/.netlify/functions/pay", {
+                                        method: "POST",
+                                        headers: headers,
+                                        body: JSON.stringify({
+                                            name: name, phone: phone, email: email, address: address,
+                                            zone: zone, item: item, quantity: quantity
+                                        })
+                                    });
+                                    result = await res.json();
+                                    if (!res.ok) throw new Error(result.error || "HTTP " + res.status);
+                                } catch (err) {
+                                    console.error("Error starting payment:", err);
+                                    submitBtn.disabled = false;
+                                    submitBtn.textContent = "Place Order";
+                                    alert("Sorry, we couldn't start your payment. " + (err.message || "") + "\nPlease try again or message us on WhatsApp.");
+                                    return;
+                                }
+                                // Off to Paystack. After paying, Paystack sends the customer back here.
+                                // The order is confirmed by Paystack's webhook (not by this page), and the
+                                // WhatsApp message to the kitchen is only sent once that confirmation lands.
+                                window.location.assign(result.url);
+                            });
+                            // If the customer presses Back from the Paystack page, the browser may restore
+                            // this page from memory with the button still disabled. Reset it.
+                            window.addEventListener("pageshow", function (e) {
+                                if (!e.persisted) return;
+                                var btn = document.getElementById("submitOrder");
+                                btn.disabled = false;
+                                btn.textContent = "Place Order";
                             });
                             </script>
                             <script>
