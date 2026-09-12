@@ -3,11 +3,60 @@
 }
 body {
     font-family: Georgia, serif;
-    background-color: #faf4e8;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns%3D'http://www.w3.org/2000/svg' width%3D'90' height%3D'45'%3E%3Cpath d%3D'M0 22 C15 4, 30 4, 45 22 S75 40, 90 22' stroke%3D'rgba%2898,17,12,0.05%29' stroke-width%3D'2' fill%3D'none'/%3E%3C/svg%3E");
+    background-color: #1c0f0b;
     color: #605c56;
     padding: 20px;
     margin: 0;
+    min-height: 100vh;
+}
+/* Full-page food photo. Fixed layer behind everything; a dark gradient keeps the
+   white cards readable on top. Each page picks its own photo via --bg-photo:
+   home/ordering page = plated dish, "My orders" page = delivery packs.
+   Phones get a smaller portrait crop (~60 KB). A tiny blurred placeholder shows
+   until the photo arrives. */
+body {
+    --bg-photo: url("bg-home-m.webp");
+    --bg-placeholder: url("data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABQODxIPDRQSEBIXFRQYHjIhHhwcHj0sLiQySUBMS0dARkVQWnNiUFVtVkVGZIhlbXd7gYKBTmCNl4x9lnN+gXz/2wBDARUXFx4aHjshITt8U0ZTfHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHz/wAARCAASACADASIAAhEBAxEB/8QAGgAAAgMBAQAAAAAAAAAAAAAAAAQBBQYCA//EACMQAAICAQMDBQAAAAAAAAAAAAECAAMRBBIxISJBBRMUUWH/xAAYAQACAwAAAAAAAAAAAAAAAAADBAABAv/EABsRAAIDAAMAAAAAAAAAAAAAAAABAhEhMUFR/9oADAMBAAIRAxEAPwBKrGrs91zlF8T3exG7VrDDHES9OcCpqsjfyBJUvXYSoO4xSVp4PKmtF9bUtDCyodr+PqVrZJJMste+FSsnLcn8iJGYdC0vDqkkatcEjrNNaB8Tdjrt5hCR9GnyzMWEmw5OZBhCWDP/2Q==");
+}
+body:has(#ordersPanel) {
+    --bg-photo: url("bg-orders-m.webp");
+    --bg-placeholder: url("data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABQODxIPDRQSEBIXFRQYHjIhHhwcHj0sLiQySUBMS0dARkVQWnNiUFVtVkVGZIhlbXd7gYKBTmCNl4x9lnN+gXz/2wBDARUXFx4aHjshITt8U0ZTfHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHz/wAARCAASACADASIAAhEBAxEB/8QAGAAAAwEBAAAAAAAAAAAAAAAAAAIEBgX/xAAjEAACAQQBAwUAAAAAAAAAAAABAgADBBEhEhMzQSIxMlFx/8QAGAEAAwEBAAAAAAAAAAAAAAAAAAEDAgT/xAAaEQEBAQADAQAAAAAAAAAAAAABAAIREkIy/9oADAMBAAIRAxEAPwDPWdNKgLP48SnCUblGpYdV2cSazCtyDGVcUoVeLsFVxnUhpezdGQ6l1BfUHos2RobEztxU6tZnAwCYP3TwPpMGXiuSd/UeQIR0cz2vun7FuiTX3CEPdnxK/wAVjN2TCEdTPy3/2Q==");
+}
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background-color: #1c0f0b;
+    background-image:
+        linear-gradient(180deg, rgba(20, 8, 6, 0.55) 0%, rgba(20, 8, 6, 0.35) 40%, rgba(20, 8, 6, 0.75) 100%),
+        var(--bg-photo),
+        var(--bg-placeholder);
+    background-size: cover;
+    background-position: center 35%;
+}
+/* Wide landscape screens (laptops, tablets held sideways) get the wide photo;
+   anything taller than it is wide (phones, tablets held upright) keeps the
+   portrait crop so the food stays in frame. */
+@media (min-width: 700px) and (orientation: landscape) {
+    body { --bg-photo: url("bg-home.webp"); }
+    body:has(#ordersPanel) { --bg-photo: url("bg-orders.webp"); }
+    body::before {
+        background-image:
+            linear-gradient(180deg, rgba(20, 8, 6, 0.5) 0%, rgba(20, 8, 6, 0.3) 40%, rgba(20, 8, 6, 0.7) 100%),
+            var(--bg-photo),
+            var(--bg-placeholder);
+    }
+}
+/* Cross-page transition: a quick fade + slight lift. Browsers without support
+   just navigate normally. */
+@view-transition { navigation: auto; }
+@keyframes pageIn  { from { opacity: 0; transform: translateY(12px); } }
+@keyframes pageOut { to   { opacity: 0; transform: translateY(-8px); } }
+::view-transition-old(root) { animation: pageOut 180ms ease-in; }
+::view-transition-new(root) { animation: pageIn 260ms ease-out; }
+@media (prefers-reduced-motion: reduce) {
+    ::view-transition-old(root), ::view-transition-new(root) { animation: none; }
 }
 .siteHeader {
     max-width: 400px;
@@ -19,23 +68,34 @@ body {
     margin: 0 auto 8px;
 }
 .siteHeader h1 {
-    font-size: 28px;
-    color: #62110c;
+    font-size: 32px;
+    color: #fff7ec;
     margin: 0;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
 }
 .siteHeader p {
-    font-size: 14px;
-    color: #605c56;
+    font-size: 15px;
+    color: #f3e4cf;
     margin: 6px 0 0;
+    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.7);
 }
+.siteHeader img { filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.5)); }
+#accountStatus { color: #f3e4cf; text-shadow: 0 1px 6px rgba(0, 0, 0, 0.7); }
+#myOrdersLink { color: #ffd9b0 !important; }
+#ordersStatus { color: #f3e4cf; }
+#ordersStatus a { color: #ffd9b0 !important; }
 form {
     max-width: 400px;
     margin: 0 auto;
-    background-color: white;
+    background-color: rgba(255, 255, 255, 0.94);
     border: 2px solid #62110c;
-    border-radius: 8px;
+    border-radius: 12px;
     padding: 20px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+    /* no backdrop-filter here: it would pin the fixed chat widget (which sits
+       inside this form in the HTML) to the card instead of the screen */
 }
+.fieldNote { display: block; margin-top: 6px; font-size: 13px; line-height: 1.35; }
 label {
     color: #62110c;
     font-weight: bold;
@@ -243,7 +303,8 @@ button:hover {
 .siteHeader a { display: inline-block; }
 .ordersPanel { max-width: 400px; margin: 0 auto; }
 .pointsSummary {
-    background-color: #62110c;
+    background-color: rgba(98, 17, 12, 0.95);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
     color: white;
     border-radius: 8px;
     padding: 16px 20px;
@@ -258,7 +319,8 @@ button:hover {
     display: flex;
     align-items: center;
     gap: 12px;
-    background-color: white;
+    background-color: rgba(255, 255, 255, 0.94);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
     border: 1px solid #d0c095;
     border-radius: 8px;
     padding: 12px 14px;
@@ -287,7 +349,7 @@ button:hover {
 .orderPointsNum { display: block; font-size: 20px; font-weight: bold; color: #62110c; line-height: 1; }
 .orderPointsLabel { font-size: 11px; color: #605c56; }
 .ordersEmpty {
-    background-color: white;
+    background-color: rgba(255, 255, 255, 0.94);
     border: 1px dashed #d0c095;
     border-radius: 8px;
     padding: 20px;
@@ -295,12 +357,14 @@ button:hover {
     font-size: 14px;
 }
 .backLink { text-align: center; font-size: 14px; margin-top: 20px; }
-.backLink a, #ordersStatus a { color: #62110c; }
+.backLink { color: #f3e4cf; }
+.backLink a { color: #ffd9b0; }
 /* ---- Payment result (back from Paystack) ---- */
 .paymentResult {
     max-width: 400px;
     margin: 0 auto 20px;
-    background-color: white;
+    background-color: rgba(255, 255, 255, 0.96);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
     border: 2px solid #d0c095;
     border-left-width: 8px;
     border-radius: 8px;
@@ -326,3 +390,21 @@ button:hover {
 }
 .whatsappBtn:hover { background-color: #1ebe5d; }
 #paymentCloseBtn { text-align: left; width: auto; }
+/* ---- Tablet and desktop layout (700px and wider) ----
+   Wider cards and a two-column order form so the whole form fits on an iPad
+   held sideways without scrolling. Phones keep the single column above. */
+@media (min-width: 700px) {
+    .siteHeader, .ordersPanel, .paymentResult { max-width: 640px; }
+    .siteHeader h1 { font-size: 40px; }
+    .siteHeader p { font-size: 17px; }
+    #orderForm {
+        max-width: 640px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        column-gap: 20px;
+        padding: 24px 28px 28px;
+    }
+    #orderForm > div:last-child { grid-column: 1 / -1; }   /* quantity + Place Order */
+    #quantity { max-width: 120px; margin-right: 16px; }
+    #chatWindow { width: min(360px, calc(100vw - 32px)); max-height: min(520px, 70vh); }
+}
