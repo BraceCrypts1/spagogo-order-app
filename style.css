@@ -408,3 +408,69 @@ button:hover {
     #quantity { max-width: 120px; margin-right: 16px; }
     #chatWindow { width: min(360px, calc(100vw - 32px)); max-height: min(520px, 70vh); }
 }
+
+/* ---- Kitchen / staff board (staff.html) ---- */
+body.staffPage { --bg-photo: url("bg-orders-m.webp"); }
+@media (min-width: 700px) and (orientation: landscape) {
+    body.staffPage { --bg-photo: url("bg-orders.webp"); }
+}
+#staffStatus { color: #f3e4cf; text-shadow: 0 1px 6px rgba(0, 0, 0, 0.7); }
+.staffLogin { max-width: 400px; }
+.staffLogin #staffLoginMessage { margin: 10px 0 0; font-size: 14px; }
+.staffLogin #staffLoginMessage.error { color: #b3261e; }
+.staffBoard { max-width: 640px; margin: 0 auto; }
+.staffToolbar {
+    display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between;
+    background-color: rgba(255, 255, 255, 0.94);
+    border-radius: 12px; padding: 10px 14px; margin-bottom: 12px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+}
+.staffFilters { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.staffFilter { margin: 0; padding: 6px 14px; font-size: 14px; border-radius: 16px;
+    background-color: transparent; color: #62110c; border: 1px solid #62110c; }
+.staffFilter.isActive, .staffFilter:hover { background-color: #62110c; color: #fff; }
+.staffOnlyOpen { font-size: 14px; color: #605c56; margin-left: 6px; display: inline-flex; align-items: center; gap: 4px; }
+.staffOnlyOpen input { width: auto; margin: 0; }
+.staffTools { display: flex; gap: 6px; align-items: center; }
+.staffCount { font-size: 13px; color: #605c56; margin-right: 4px; }
+.staffSmallBtn { margin: 0; padding: 6px 12px; font-size: 13px; }
+.staffMessage { color: #f3e4cf; font-size: 14px; margin: 0 0 10px; min-height: 1.2em; text-align: center; }
+.staffMessage.error { color: #ffb4a8; }
+.staffList { list-style: none; margin: 0; padding: 0; }
+.staffOrder {
+    background-color: rgba(255, 255, 255, 0.96);
+    border: 1px solid #d0c095; border-left: 8px solid #f2b705; border-radius: 8px;
+    padding: 12px 14px; margin-bottom: 10px; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    font-size: 14px; color: #3d3a36;
+}
+.staffOrder.k-preparing        { border-left-color: #1976d2; }
+.staffOrder.k-out_for_delivery { border-left-color: #7b1fa2; }
+.staffOrder.k-delivered        { border-left-color: #2e7d32; opacity: 0.8; }
+.staffOrder.k-cancelled        { border-left-color: #8d6e63; opacity: 0.7; }
+.staffOrder.p-pending.k-new    { border-left-color: #bdbdbd; }
+.staffOrderTop { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; margin-bottom: 6px; }
+.staffOrderId { font-weight: bold; color: #62110c; font-size: 16px; }
+.staffOrderTime { color: #605c56; font-size: 13px; }
+.staffPay, .staffKitchen { font-size: 12px; font-weight: bold; padding: 2px 8px; border-radius: 10px; }
+.staffPay.p-approved { background: #e3f4e5; color: #2e7d32; }
+.staffPay.p-pending  { background: #f3f3f3; color: #616161; }
+.staffPay.p-rejected, .staffPay.p-error { background: #fde7e7; color: #c62828; }
+.staffKitchen { background: #fff4d6; color: #5a4300; margin-left: auto; }
+.staffKitchen.k-preparing        { background: #e3f0fb; color: #0d47a1; }
+.staffKitchen.k-out_for_delivery { background: #f1e5f8; color: #4a148c; }
+.staffKitchen.k-delivered        { background: #e3f4e5; color: #1b5e20; }
+.staffKitchen.k-cancelled        { background: #efebe9; color: #4e342e; }
+.staffItem { font-weight: bold; color: #62110c; font-size: 15px; line-height: 1.3; }
+.staffWho { margin-top: 4px; }
+.staffWho a { color: #62110c; }
+.staffAddress { color: #605c56; margin-top: 2px; }
+.staffActions { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; margin-top: 8px; }
+.staffNextBtn { margin: 0; padding: 8px 16px; font-size: 14px; }
+.staffNextBtn:disabled { background-color: #bdbdbd; cursor: not-allowed; }
+.staffCancelBtn { margin: 0; font-size: 13px; color: #8d6e63 !important; }
+.staffNote { font-size: 13px; color: #8d6e63; }
+.staffEmpty {
+    background-color: rgba(255, 255, 255, 0.94); border: 1px dashed #d0c095; border-radius: 8px;
+    padding: 20px; text-align: center; font-size: 14px; color: #605c56;
+}
+

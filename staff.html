@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Kitchen — Fatima Spagogo</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="robots" content="noindex">
+        <link rel="icon" type="image/svg+xml" href="logo.svg">
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body class="staffPage">
+        <header class="siteHeader">
+            <a href="index.html"><img src="logo.svg" alt="Fatima Spagogo" width="56" height="56"></a>
+            <h1>Kitchen</h1>
+            <p id="staffStatus">Checking access…</p>
+        </header>
+
+        <!-- Staff login: same accounts as the ordering page, but only accounts on
+             the staff list get past the server function. -->
+        <form id="staffLoginForm" class="staffLogin hidden">
+            <div>
+                <label for="staffEmail">Email:</label>
+                <input type="email" id="staffEmail" name="email" autocomplete="username" required>
+            </div>
+            <div>
+                <label for="staffPassword">Password:</label>
+                <input type="password" id="staffPassword" name="password" autocomplete="current-password" required>
+            </div>
+            <p id="staffLoginMessage" aria-live="polite"></p>
+            <button type="submit" id="staffLoginBtn">Log in</button>
+        </form>
+
+        <section id="staffBoard" class="staffBoard hidden">
+            <div class="staffToolbar">
+                <div class="staffFilters" role="group" aria-label="Which orders">
+                    <button type="button" class="staffFilter isActive" data-range="today">Today</button>
+                    <button type="button" class="staffFilter" data-range="all">All</button>
+                    <label class="staffOnlyOpen"><input type="checkbox" id="staffOnlyOpen" checked> Open only</label>
+                </div>
+                <div class="staffTools">
+                    <span id="staffCount" class="staffCount"></span>
+                    <button type="button" id="staffRefreshBtn" class="staffSmallBtn">Refresh</button>
+                    <button type="button" id="staffLogoutBtn" class="staffSmallBtn">Log out</button>
+                </div>
+            </div>
+            <p id="staffMessage" class="staffMessage" aria-live="polite"></p>
+            <ul id="staffList" class="staffList"></ul>
+        </section>
+
+        <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+        <script>
+            const supabaseUrl = "https://secpyyvdokaidzkstbqm.supabase.co";
+            const supabaseKey = "sb_publishable_8tDy1gTILSX3CVCNTcyF1g_toSX7sr8";
+            const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+        </script>
+        <script src="staff.js"></script>
+        </body>
+</html>
